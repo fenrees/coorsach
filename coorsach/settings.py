@@ -25,7 +25,7 @@ SECRET_KEY = 'mez&)sa+l3ch@&=t-rj@_#&&r234xj^bvt^trg_5guxl$van_('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '<fenrees>.pythonanywhere.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'fenrees.pythonanywhere.com']
 
 
 # Application definition
