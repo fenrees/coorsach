@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, HttpResponse
 import sys
 import string
 import os
@@ -7,18 +7,18 @@ from django.utils import timezone
 from .models import Post
 
 def open_file(name):
-    file = r"\table\{0}.json".format(name)
+    file = r"/table/{0}.json".format(name)
     path = os.getcwd() + file
-    with open(path, "r", encoding='utf-8') as fh:
-        data = json.load(fh)
+    with open(path, "r", encoding='utf-8') as f:
+        data = json.load(f)
     return data
 
 
 def write_in_file(name, text):
-    file = r"\table\{0}.json".format(name)
+    file = r"/table/{0}.json".format(name)
     path = os.getcwd() + file
-    with open(path, "w", encoding='utf-8') as fh:
-        fh.write(text)
+    with open(path, "w", encoding='utf-8') as f:
+        f.write(text)
     pass
 
 
@@ -33,28 +33,37 @@ def admin(request):
     for i in logininfo:
         if request.POST.get('login') == i["login"] and request.POST.get('password') == i["password"]:
             return render(request, "table/Admin.html", {'syst': syst})
-
-    return render(request, "table/Title.html", {'syst': syst})  
+    return render(request, "table/Title.html", {'syst': syst})
 
 
 def get_system(request):
-    syst = open_file ("system")
+    syst = open_file("system")
     return render(request, "table/Title.html", {'syst': syst})
 
 
 def add_book(request):
-    syst = open_file("system")
-    for i in syst:
-        if i["id"] == request.POST.get("1"):
-            book = {
-            "name" : request.POST.get("название"),
-            "autor" : request.POST.get("автор"),
-            "date0" : request.POST.get("дата поступления в фонд"),
-            "date1" : request.POST.get("дата выхода из фонда"),
-            "reason" : request.POST.get("причина выхода")
-                        }
-            i["book"].append(book)
-            write_in_file("system", str(syst).replace("\'", "\""))
-            return render(request, "table/Admin.html", {'syst': syst})
+    if request.POST:
+        id = request.POST.get("id")
+        name = request.POST.get("name")
+        author = request.POST.get("author")
+        date0 = request.POST.get("date0")
+        date1 = request.POST.get("date1")
+        reason = request.POST.get("reason")
 
-    return render(request, "table/Title.html", {'syst': syst}) 
+        book = {
+                "id": id,
+                "name": name,
+                "author": author,
+                "date0": date0,
+                "date1": date1,
+                "reason": reason,
+        }
+        with open("system.json", "r", encoding='utf-8') as f:
+            data = json.load(f)
+        f.close()
+
+        with open("system.json", 'w', encoding='utf-8') as f:
+            data.append(book)
+            f.write(json.dumps(data, indent=4))
+            f.close()
+        return render(request, "table/Title.html")
